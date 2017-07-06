@@ -2,7 +2,7 @@ from distutils.core import setup
 from catkin_pkg.python_setup import generate_distutils_setup
 
 d = generate_distutils_setup(
-    packages=['challenge_demo_ED'],
+    packages=['challenge_demo_ed'],
     package_dir={'': 'src'}
 )
 
