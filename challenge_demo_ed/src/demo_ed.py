@@ -278,7 +278,7 @@ def setup_statemachine(robot):
                                             'unreachable': 'TIMEOUT2',
                                             'goal_not_defined': 'TIMEOUT2'})
 
-        smach.StateMachine.add('TIMEOUT2,
+        smach.StateMachine.add('TIMEOUT2',
                                checkTimeOut(robot, challenge_knowledge.time_out_seconds),
                                transitions={'not_yet': 'GOTO_TARGET2', 'time_out': 'SAY_TARGET2_FAILED'})
 
@@ -365,7 +365,7 @@ def setup_statemachine(robot):
                                 states.ResetED(robot),
                                 transitions={   'done'              :   'GOTO_STARTING_POINT_BACKUP'})
 
-        smach.StateMachine.add('GOTO_TARGET3_BACKUP',
+        smach.StateMachine.add('GOTO_STARTING_POINT_BACKUP',
                                 states.NavigateToWaypoint(robot, EntityByIdDesignator(robot, id=challenge_knowledge.starting_point), challenge_knowledge.starting_point_radius2),
                                 transitions={   'arrived'           :   'SAY_STARTING_POINT_REACHED',
                                                 'unreachable'       :   'TIMEOUT_STARTING_POINT',
