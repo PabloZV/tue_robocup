@@ -214,7 +214,7 @@ def setup_statemachine(robot):
                                states.Say(robot, ["Reached target 1",
                                                   "I have arrived at target 1",
                                                   "I am now at target 1"], block=True),
-                               transitions={'spoken': 'SAY_GOTO_TARGET3'})
+                               transitions={'spoken': 'SAY_GOTO_TARGET2'})
 
         smach.StateMachine.add('RESET_ED_TARGET1',
                                states.ResetED(robot),
