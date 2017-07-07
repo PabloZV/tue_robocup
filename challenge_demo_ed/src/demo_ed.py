@@ -182,7 +182,7 @@ def setup_statemachine(robot):
 
     with sm:
         # Start challenge via StartChallengeRobust
-        smach.StateMachine.add("START_CHALLENGE_ROBUST",
+        smach.StateMachine.add("START_DEMO",
                                states.Initialize(robot),
                                transitions={"initialized": "SAY_GOTO_TARGET1",
                                             "abort": "SAY_GOTO_TARGET1"})
@@ -310,7 +310,7 @@ def setup_statemachine(robot):
                                 states.Say(robot, ["Reached target 3",
                                                     "I have arrived at target 3",
                                                     "I am now at target 3"], block=True),
-                                transitions={   'spoken'            :   'SAY_GOTO_STARTING_POINT'})
+                                transitions={   'spoken'            :   'SAY_GOTO_TARGET4'})
 
         smach.StateMachine.add('RESET_ED_TARGET3',
                                 states.ResetED(robot),
@@ -331,7 +331,57 @@ def setup_statemachine(robot):
                                 states.Say(robot, ["I am not able to reach target 3",
                                                     "I cannot reach target 3",
                                                     "Target 3 is unreachable"], block=True),
-                                transitions={   'spoken'            :   'SAY_GOTO_STARTING_POINT'})
+                                transitions={   'spoken'            :   'SAY_GOTO_TARGET4'})
+
+        smach.StateMachine.add('SAY_GOTO_TARGET4',
+                               states.Say(robot, ["I will go to target 4 now",
+                                                  "I will now go to target 4",
+                                                  "Lets go to target 4",
+                                                  "Going to target 4"], block=False),
+                               transitions={'spoken': 'GOTO_TARGET4'})
+
+        ######################################################################################################################################################
+        #
+        #                                                       TARGET 4
+        #
+        ######################################################################################################################################################
+
+        smach.StateMachine.add('GOTO_TARGET4',
+                               states.NavigateToWaypoint(robot,
+                                                         EntityByIdDesignator(robot, id=challenge_knowledge.target4),
+                                                         challenge_knowledge.target4_radius1),
+                               transitions={'arrived': 'SAY_TARGET4_REACHED',
+                                            'unreachable': 'RESET_ED_TARGET4',
+                                            'goal_not_defined': 'RESET_ED_TARGET4'})
+
+        smach.StateMachine.add('SAY_TARGET4_REACHED',
+                               states.Say(robot, ["Reached target 4",
+                                                  "I have arrived at target 4",
+                                                  "I am now at target 4"], block=True),
+                               transitions={'spoken': 'SAY_GOTO_STARTING_POINT'})
+
+        smach.StateMachine.add('RESET_ED_TARGET4',
+                               states.ResetED(robot),
+                               transitions={'done': 'GOTO_TARGET4_BACKUP'})
+
+        smach.StateMachine.add('GOTO_TARGET4_BACKUP',
+                               states.NavigateToWaypoint(robot,
+                                                         EntityByIdDesignator(robot, id=challenge_knowledge.target4),
+                                                         challenge_knowledge.target4_radius2),
+                               transitions={'arrived': 'SAY_TARGET4_REACHED',
+                                            'unreachable': 'TIMEOUT4',
+                                            'goal_not_defined': 'TIMEOUT4'})
+
+        smach.StateMachine.add('TIMEOUT4',
+                               checkTimeOut(robot, challenge_knowledge.time_out_seconds),
+                               transitions={'not_yet': 'GOTO_TARGET4', 'time_out': 'SAY_TARGET4_FAILED'})
+
+        # Should we mention that we failed???
+        smach.StateMachine.add('SAY_TARGET4_FAILED',
+                               states.Say(robot, ["I am not able to reach target 4",
+                                                  "I cannot reach target 4",
+                                                  "Target 4 is unreachable"], block=True),
+                               transitions={'spoken': 'SAY_GOTO_STARTING_POINT'})
 
         smach.StateMachine.add('SAY_GOTO_STARTING_POINT',
                                states.Say(robot, ["I will go back to the starting point",
@@ -382,7 +432,7 @@ def setup_statemachine(robot):
 
         smach.StateMachine.add('AT_END',
                                states.Say(robot, "Goodbye"),
-                               transitions={'spoken': 'Done'})
+                               transitions={'spoken': 'START_DEMO'})
 
     analyse_designators(sm, "demo_ED")
     return sm
